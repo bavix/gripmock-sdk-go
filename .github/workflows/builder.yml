@@ -1,0 +1,64 @@
+name: builder
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  sdk:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: 1.22
+          cache: true
+
+      - name: Generate SDK
+        run: |
+          make gen
+          go mod tidy
+
+      - name: "Git add --all"
+        run: git add --all
+
+      - name: "Check if build has changed"
+        if: success()
+        id: has-changes
+        run: |
+          echo "stdout<<EOF" >> $GITHUB_OUTPUT
+          echo "$(git diff  --stat)" >> $GITHUB_OUTPUT
+          echo 'EOF' >> $GITHUB_OUTPUT
+
+      - name: Import GPG key
+        if: ${{ steps.has-changes.outputs.stdout }}
+        uses: crazy-max/ghaction-import-gpg@v6
+        with:
+          gpg_private_key: ${{ secrets.GPG_BOT }}
+          passphrase: ${{ secrets.GPG_PASSPHRASE }}
+          fingerprint: ${{ secrets.GPG_FINGERPRINT }}
+          git_config_global: true
+          git_user_signingkey: true
+          git_commit_gpgsign: true
+          git_committer_name: Github bot
+          git_committer_email: bot@babichev.net
+
+      - name: "Commit files"
+        if: ${{ steps.has-changes.outputs.stdout }}
+        env:
+          GH_TOKEN: ${{ secrets.BOT_TOKEN }}
+        run: |
+          gh pr checkout ${{ github.event.pull_request.number }}
+          git commit -S -m "sdk generated" -a
+
+      - name: "Push changes"
+        if: ${{ steps.has-changes.outputs.stdout }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.BOT_TOKEN }}
+        run: git push -u origin HEAD
