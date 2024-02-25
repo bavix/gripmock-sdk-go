@@ -25,9 +25,6 @@ jobs:
           make gen
           go mod tidy
 
-      - name: "Git add --all"
-        run: git add --all
-
       - name: "Check if build has changed"
         if: success()
         id: has-changes
