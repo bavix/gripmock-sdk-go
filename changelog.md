@@ -1,5 +1,13 @@
 # Changelog
 
+## v1.0.2 - 2024-03-05
+
+### What's Changed
+
+* Bump google.golang.org/grpc from 1.62.0 to 1.62.1 by [@dependabot](https://github.com/dependabot) in https://github.com/bavix/gripmock-sdk-go/pull/5
+
+**Full Changelog**: https://github.com/bavix/gripmock-sdk-go/compare/v1.0.1...v1.0.2
+
 ## v1.0.1 - 2024-02-27
 
 ### What's Changed
