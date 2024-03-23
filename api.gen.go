@@ -31,6 +31,12 @@ type MessageOK struct {
 	Time    time.Time `json:"time"`
 }
 
+// Method defines model for Method.
+type Method struct {
+	Id   string `json:"id"`
+	Name string `json:"name"`
+}
+
 // SearchRequest defines model for SearchRequest.
 type SearchRequest struct {
 	Data    interface{}       `json:"data"`
@@ -46,6 +52,14 @@ type SearchResponse struct {
 	Data    interface{}       `json:"data"`
 	Error   string            `json:"error"`
 	Headers map[string]string `json:"headers,omitempty"`
+}
+
+// Service defines model for Service.
+type Service struct {
+	Id      string   `json:"id"`
+	Methods []Method `json:"methods"`
+	Name    string   `json:"name"`
+	Package string   `json:"package"`
 }
 
 // Stub defines model for Stub.
@@ -177,6 +191,12 @@ type ClientInterface interface {
 	// Readiness request
 	Readiness(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
 
+	// ServicesList request
+	ServicesList(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// ServiceMethodsList request
+	ServiceMethodsList(ctx context.Context, serviceID string, reqEditors ...RequestEditorFn) (*http.Response, error)
+
 	// PurgeStubs request
 	PurgeStubs(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
 
@@ -206,6 +226,9 @@ type ClientInterface interface {
 
 	// DeleteStubByID request
 	DeleteStubByID(ctx context.Context, uuid ID, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// FindByID request
+	FindByID(ctx context.Context, uuid ID, reqEditors ...RequestEditorFn) (*http.Response, error)
 }
 
 func (c *Client) Liveness(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
@@ -222,6 +245,30 @@ func (c *Client) Liveness(ctx context.Context, reqEditors ...RequestEditorFn) (*
 
 func (c *Client) Readiness(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewReadinessRequest(c.Server)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) ServicesList(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewServicesListRequest(c.Server)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) ServiceMethodsList(ctx context.Context, serviceID string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewServiceMethodsListRequest(c.Server, serviceID)
 	if err != nil {
 		return nil, err
 	}
@@ -364,6 +411,18 @@ func (c *Client) DeleteStubByID(ctx context.Context, uuid ID, reqEditors ...Requ
 	return c.Client.Do(req)
 }
 
+func (c *Client) FindByID(ctx context.Context, uuid ID, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewFindByIDRequest(c.Server, uuid)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
 // NewLivenessRequest generates requests for Liveness
 func NewLivenessRequest(server string) (*http.Request, error) {
 	var err error
@@ -401,6 +460,67 @@ func NewReadinessRequest(server string) (*http.Request, error) {
 	}
 
 	operationPath := fmt.Sprintf("/health/readiness")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewServicesListRequest generates requests for ServicesList
+func NewServicesListRequest(server string) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/services")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewServiceMethodsListRequest generates requests for ServiceMethodsList
+func NewServiceMethodsListRequest(server string, serviceID string) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "serviceID", runtime.ParamLocationPath, serviceID)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/services/%s/methods", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -680,6 +800,40 @@ func NewDeleteStubByIDRequest(server string, uuid ID) (*http.Request, error) {
 	return req, nil
 }
 
+// NewFindByIDRequest generates requests for FindByID
+func NewFindByIDRequest(server string, uuid ID) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "uuid", runtime.ParamLocationPath, uuid)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/stubs/%s", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
 func (c *Client) applyEditors(ctx context.Context, req *http.Request, additionalEditors []RequestEditorFn) error {
 	for _, r := range c.RequestEditors {
 		if err := r(ctx, req); err != nil {
@@ -729,6 +883,12 @@ type ClientWithResponsesInterface interface {
 	// ReadinessWithResponse request
 	ReadinessWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*ReadinessResponse, error)
 
+	// ServicesListWithResponse request
+	ServicesListWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*ServicesListResponse, error)
+
+	// ServiceMethodsListWithResponse request
+	ServiceMethodsListWithResponse(ctx context.Context, serviceID string, reqEditors ...RequestEditorFn) (*ServiceMethodsListResponse, error)
+
 	// PurgeStubsWithResponse request
 	PurgeStubsWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*PurgeStubsResponse, error)
 
@@ -758,6 +918,9 @@ type ClientWithResponsesInterface interface {
 
 	// DeleteStubByIDWithResponse request
 	DeleteStubByIDWithResponse(ctx context.Context, uuid ID, reqEditors ...RequestEditorFn) (*DeleteStubByIDResponse, error)
+
+	// FindByIDWithResponse request
+	FindByIDWithResponse(ctx context.Context, uuid ID, reqEditors ...RequestEditorFn) (*FindByIDResponse, error)
 }
 
 type LivenessResponse struct {
@@ -798,6 +961,50 @@ func (r ReadinessResponse) Status() string {
 
 // StatusCode returns HTTPResponse.StatusCode
 func (r ReadinessResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type ServicesListResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *[]Service
+}
+
+// Status returns HTTPResponse.Status
+func (r ServicesListResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r ServicesListResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type ServiceMethodsListResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *[]Method
+}
+
+// Status returns HTTPResponse.Status
+func (r ServiceMethodsListResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r ServiceMethodsListResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
@@ -979,6 +1186,28 @@ func (r DeleteStubByIDResponse) StatusCode() int {
 	return 0
 }
 
+type FindByIDResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *Stub
+}
+
+// Status returns HTTPResponse.Status
+func (r FindByIDResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r FindByIDResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
 // LivenessWithResponse request returning *LivenessResponse
 func (c *ClientWithResponses) LivenessWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*LivenessResponse, error) {
 	rsp, err := c.Liveness(ctx, reqEditors...)
@@ -995,6 +1224,24 @@ func (c *ClientWithResponses) ReadinessWithResponse(ctx context.Context, reqEdit
 		return nil, err
 	}
 	return ParseReadinessResponse(rsp)
+}
+
+// ServicesListWithResponse request returning *ServicesListResponse
+func (c *ClientWithResponses) ServicesListWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*ServicesListResponse, error) {
+	rsp, err := c.ServicesList(ctx, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseServicesListResponse(rsp)
+}
+
+// ServiceMethodsListWithResponse request returning *ServiceMethodsListResponse
+func (c *ClientWithResponses) ServiceMethodsListWithResponse(ctx context.Context, serviceID string, reqEditors ...RequestEditorFn) (*ServiceMethodsListResponse, error) {
+	rsp, err := c.ServiceMethodsList(ctx, serviceID, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseServiceMethodsListResponse(rsp)
 }
 
 // PurgeStubsWithResponse request returning *PurgeStubsResponse
@@ -1093,6 +1340,15 @@ func (c *ClientWithResponses) DeleteStubByIDWithResponse(ctx context.Context, uu
 	return ParseDeleteStubByIDResponse(rsp)
 }
 
+// FindByIDWithResponse request returning *FindByIDResponse
+func (c *ClientWithResponses) FindByIDWithResponse(ctx context.Context, uuid ID, reqEditors ...RequestEditorFn) (*FindByIDResponse, error) {
+	rsp, err := c.FindByID(ctx, uuid, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseFindByIDResponse(rsp)
+}
+
 // ParseLivenessResponse parses an HTTP response from a LivenessWithResponse call
 func ParseLivenessResponse(rsp *http.Response) (*LivenessResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
@@ -1135,6 +1391,58 @@ func ParseReadinessResponse(rsp *http.Response) (*ReadinessResponse, error) {
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
 		var dest MessageOK
+		if err := jsonUnmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseServicesListResponse parses an HTTP response from a ServicesListWithResponse call
+func ParseServicesListResponse(rsp *http.Response) (*ServicesListResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &ServicesListResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest []Service
+		if err := jsonUnmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseServiceMethodsListResponse parses an HTTP response from a ServiceMethodsListWithResponse call
+func ParseServiceMethodsListResponse(rsp *http.Response) (*ServiceMethodsListResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &ServiceMethodsListResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest []Method
 		if err := jsonUnmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
@@ -1320,6 +1628,32 @@ func ParseDeleteStubByIDResponse(rsp *http.Response) (*DeleteStubByIDResponse, e
 	response := &DeleteStubByIDResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
+	}
+
+	return response, nil
+}
+
+// ParseFindByIDResponse parses an HTTP response from a FindByIDWithResponse call
+func ParseFindByIDResponse(rsp *http.Response) (*FindByIDResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &FindByIDResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest Stub
+		if err := jsonUnmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
 	}
 
 	return response, nil
