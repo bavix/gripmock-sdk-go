@@ -4,7 +4,7 @@ go 1.22.0
 
 require (
 	github.com/oapi-codegen/runtime v1.1.1
-	google.golang.org/grpc v1.63.0
+	google.golang.org/grpc v1.63.2
 )
 
 require (
