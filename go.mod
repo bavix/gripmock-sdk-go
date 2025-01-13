@@ -6,7 +6,7 @@ toolchain go1.22.9
 
 require (
 	github.com/oapi-codegen/runtime v1.1.1
-	google.golang.org/grpc v1.69.2
+	google.golang.org/grpc v1.69.4
 )
 
 require (
