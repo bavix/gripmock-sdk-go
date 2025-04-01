@@ -1,6 +1,7 @@
 module github.com/bavix/gripmock-sdk-go
 
 go 1.22.7
+
 toolchain go1.24.1
 
 require (
