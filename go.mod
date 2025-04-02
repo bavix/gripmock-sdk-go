@@ -2,11 +2,11 @@ module github.com/bavix/gripmock-sdk-go
 
 go 1.22.7
 
-toolchain go1.22.9
+toolchain go1.24.1
 
 require (
 	github.com/oapi-codegen/runtime v1.1.1
-	google.golang.org/grpc v1.71.0
+	google.golang.org/grpc v1.71.1
 )
 
 require (
