@@ -14,6 +14,7 @@ import (
 	"strings"
 	"time"
 
+	gptypes "github.com/gripmock/types"
 	"github.com/oapi-codegen/runtime"
 	openapi_types "github.com/oapi-codegen/runtime/types"
 	codes "google.golang.org/grpc/codes"
@@ -48,7 +49,7 @@ type SearchRequest struct {
 
 // SearchResponse defines model for SearchResponse.
 type SearchResponse struct {
-	Code    *codes.Code       `json:"code,omitempty"`
+	Code    codes.Code        `json:"code,omitempty"`
 	Data    interface{}       `json:"data"`
 	Error   string            `json:"error"`
 	Headers map[string]string `json:"headers,omitempty"`
@@ -67,9 +68,15 @@ type Stub struct {
 	Headers StubHeaders `json:"headers,omitempty"`
 	Id      *ID         `json:"id,omitempty"`
 	Input   StubInput   `json:"input"`
-	Method  string      `json:"method"`
-	Output  StubOutput  `json:"output"`
-	Service string      `json:"service"`
+
+	// Inputs Inputs to match against. If multiple inputs are provided, the stub will be matched if any of the inputs match.
+	Inputs []StubInput `json:"inputs,omitempty"`
+	Method string      `json:"method"`
+	Output StubOutput  `json:"output"`
+
+	// Priority Priority of the stub. Higher priority stubs are matched first.
+	Priority int    `json:"priority,omitempty"`
+	Service  string `json:"service"`
 }
 
 // StubHeaders defines model for StubHeaders.
@@ -83,7 +90,7 @@ type StubHeaders struct {
 type StubInput struct {
 	Contains         map[string]interface{} `json:"contains,omitempty"`
 	Equals           map[string]interface{} `json:"equals,omitempty"`
-	IgnoreArrayOrder *bool                  `json:"ignoreArrayOrder,omitempty"`
+	IgnoreArrayOrder bool                   `json:"ignoreArrayOrder,omitempty"`
 	Matches          map[string]interface{} `json:"matches,omitempty"`
 }
 
@@ -92,10 +99,14 @@ type StubList = []Stub
 
 // StubOutput defines model for StubOutput.
 type StubOutput struct {
-	Code    *codes.Code            `json:"code,omitempty"`
-	Data    map[string]interface{} `json:"data"`
-	Error   string                 `json:"error"`
-	Headers map[string]string      `json:"headers,omitempty"`
+	Code codes.Code             `json:"code,omitempty"`
+	Data map[string]interface{} `json:"data,omitempty"`
+
+	// Delay Delay before sending the response
+	Delay   gptypes.Duration         `json:"delay,omitempty,omitzero"`
+	Error   string                   `json:"error,omitempty"`
+	Headers map[string]string        `json:"headers,omitempty"`
+	Stream  []map[string]interface{} `json:"stream,omitempty"`
 }
 
 // AddStubJSONBody defines parameters for AddStub.
