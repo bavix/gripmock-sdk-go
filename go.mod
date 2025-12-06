@@ -1,6 +1,6 @@
 module github.com/bavix/gripmock-sdk-go
 
-go 1.24.0
+go 1.24
 
 require (
 	github.com/gripmock/types v0.0.1
