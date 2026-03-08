@@ -1,4 +1,4 @@
-OPENAPI=https://raw.githubusercontent.com/bavix/gripmock-openapi/master/api.yaml
+OPENAPI=https://raw.githubusercontent.com/bavix/gripmock/master/api/api.yaml
 
 .PHONY: *
 
