@@ -1,5 +1,28 @@
 # Changelog
 
+## v1.2.0 - 2026-03-08
+
+### What's Changed
+
+* Bump google.golang.org/grpc from 1.72.2 to 1.73.0 by [@dependabot](https://github.com/dependabot)[bot] in https://github.com/bavix/gripmock-sdk-go/pull/33
+* Bump github.com/oapi-codegen/runtime from 1.1.1 to 1.1.2 by [@dependabot](https://github.com/dependabot)[bot] in https://github.com/bavix/gripmock-sdk-go/pull/34
+* Bump google.golang.org/grpc from 1.73.0 to 1.74.0 by [@dependabot](https://github.com/dependabot)[bot] in https://github.com/bavix/gripmock-sdk-go/pull/35
+* Bump google.golang.org/grpc from 1.74.0 to 1.74.2 by [@dependabot](https://github.com/dependabot)[bot] in https://github.com/bavix/gripmock-sdk-go/pull/36
+* Bump bavix/.github from 0.3.3 to 0.4.0 by [@dependabot](https://github.com/dependabot)[bot] in https://github.com/bavix/gripmock-sdk-go/pull/40
+* Bump google.golang.org/grpc from 1.74.2 to 1.75.0 by [@dependabot](https://github.com/dependabot)[bot] in https://github.com/bavix/gripmock-sdk-go/pull/38
+* Bump actions/checkout from 4 to 5 by [@dependabot](https://github.com/dependabot)[bot] in https://github.com/bavix/gripmock-sdk-go/pull/37
+* Bump google.golang.org/grpc from 1.75.0 to 1.75.1 by [@dependabot](https://github.com/dependabot)[bot] in https://github.com/bavix/gripmock-sdk-go/pull/41
+* Bump google.golang.org/grpc from 1.75.1 to 1.77.0 by [@dependabot](https://github.com/dependabot)[bot] in https://github.com/bavix/gripmock-sdk-go/pull/43
+* Bump actions/checkout from 5 to 6 by [@dependabot](https://github.com/dependabot)[bot] in https://github.com/bavix/gripmock-sdk-go/pull/44
+* Bump bavix/.github/.github/workflows/changelog.yml from 0.4.0 to 0.4.1 by [@dependabot](https://github.com/dependabot)[bot] in https://github.com/bavix/gripmock-sdk-go/pull/45
+* Bump actions/setup-go from 5 to 6 by [@dependabot](https://github.com/dependabot)[bot] in https://github.com/bavix/gripmock-sdk-go/pull/39
+* Bump actions/setup-go from 5 to 6 and update Go to 1.24 by [@Copilot](https://github.com/Copilot) in https://github.com/bavix/gripmock-sdk-go/pull/47
+* Bump google.golang.org/grpc from 1.77.0 to 1.79.0 by [@dependabot](https://github.com/dependabot)[bot] in https://github.com/bavix/gripmock-sdk-go/pull/49
+* Bump crazy-max/ghaction-import-gpg from 6 to 7 by [@dependabot](https://github.com/dependabot)[bot] in https://github.com/bavix/gripmock-sdk-go/pull/50
+* Update OPENAPI URL in Makefile by [@rez1dent3](https://github.com/rez1dent3) in https://github.com/bavix/gripmock-sdk-go/pull/51
+
+**Full Changelog**: https://github.com/bavix/gripmock-sdk-go/compare/v1.1.1...v1.2.0
+
 ## v1.1.1 - 2025-05-26
 
 ### What's Changed
