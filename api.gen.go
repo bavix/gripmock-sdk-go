@@ -20,6 +20,51 @@ import (
 	codes "google.golang.org/grpc/codes"
 )
 
+// Defines values for MethodMethodType.
+const (
+	BidiStreaming   MethodMethodType = "bidi_streaming"
+	ClientStreaming MethodMethodType = "client_streaming"
+	ServerStreaming MethodMethodType = "server_streaming"
+	Unary           MethodMethodType = "unary"
+)
+
+// Valid indicates whether the value is a known member of the MethodMethodType enum.
+func (e MethodMethodType) Valid() bool {
+	switch e {
+	case BidiStreaming:
+		return true
+	case ClientStreaming:
+		return true
+	case ServerStreaming:
+		return true
+	case Unary:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for ProtoFieldSchemaCardinality.
+const (
+	Optional ProtoFieldSchemaCardinality = "optional"
+	Repeated ProtoFieldSchemaCardinality = "repeated"
+	Required ProtoFieldSchemaCardinality = "required"
+)
+
+// Valid indicates whether the value is a known member of the ProtoFieldSchemaCardinality enum.
+func (e ProtoFieldSchemaCardinality) Valid() bool {
+	switch e {
+	case Optional:
+		return true
+	case Repeated:
+		return true
+	case Required:
+		return true
+	default:
+		return false
+	}
+}
+
 // AddDescriptorsResponse defines model for AddDescriptorsResponse.
 type AddDescriptorsResponse struct {
 	Message string `json:"message"`
@@ -40,6 +85,60 @@ type CallRecord struct {
 	Timestamp *time.Time              `json:"timestamp,omitempty"`
 }
 
+// Dashboard defines model for Dashboard.
+type Dashboard struct {
+	AppName            string    `json:"appName"`
+	Compiler           string    `json:"compiler"`
+	GoVersion          string    `json:"goVersion"`
+	Goarch             string    `json:"goarch"`
+	Goos               string    `json:"goos"`
+	HistoryEnabled     bool      `json:"historyEnabled"`
+	HistoryErrors      int       `json:"historyErrors"`
+	NumCPU             int       `json:"numCPU"`
+	Ready              bool      `json:"ready"`
+	RuntimeDescriptors int       `json:"runtimeDescriptors"`
+	StartedAt          time.Time `json:"startedAt"`
+	TotalHistory       int       `json:"totalHistory"`
+	TotalServices      int       `json:"totalServices"`
+	TotalSessions      int       `json:"totalSessions"`
+	TotalStubs         int       `json:"totalStubs"`
+	UnusedStubs        int       `json:"unusedStubs"`
+	UptimeSeconds      int       `json:"uptimeSeconds"`
+	UsedStubs          int       `json:"usedStubs"`
+	Version            string    `json:"version"`
+}
+
+// DashboardInfo defines model for DashboardInfo.
+type DashboardInfo struct {
+	AppName            string    `json:"appName"`
+	Compiler           string    `json:"compiler"`
+	GoVersion          string    `json:"goVersion"`
+	Goarch             string    `json:"goarch"`
+	Goos               string    `json:"goos"`
+	HistoryEnabled     bool      `json:"historyEnabled"`
+	NumCPU             int       `json:"numCPU"`
+	Ready              bool      `json:"ready"`
+	RuntimeDescriptors int       `json:"runtimeDescriptors"`
+	StartedAt          time.Time `json:"startedAt"`
+	TotalServices      int       `json:"totalServices"`
+	TotalSessions      int       `json:"totalSessions"`
+	TotalStubs         int       `json:"totalStubs"`
+	UptimeSeconds      int       `json:"uptimeSeconds"`
+	Version            string    `json:"version"`
+}
+
+// DashboardOverview defines model for DashboardOverview.
+type DashboardOverview struct {
+	HistoryErrors      int `json:"historyErrors"`
+	RuntimeDescriptors int `json:"runtimeDescriptors"`
+	TotalHistory       int `json:"totalHistory"`
+	TotalServices      int `json:"totalServices"`
+	TotalSessions      int `json:"totalSessions"`
+	TotalStubs         int `json:"totalStubs"`
+	UnusedStubs        int `json:"unusedStubs"`
+	UsedStubs          int `json:"usedStubs"`
+}
+
 // DescriptorServiceIDs defines model for DescriptorServiceIDs.
 type DescriptorServiceIDs struct {
 	// ServiceIDs Service IDs added via POST /descriptors
@@ -51,6 +150,64 @@ type HistoryList = []CallRecord
 
 // ID defines model for ID.
 type ID = openapi_types.UUID
+
+// InspectCandidate defines model for InspectCandidate.
+type InspectCandidate struct {
+	Events           []InspectCandidateEvent `json:"events"`
+	ExcludedBy       []string                `json:"excludedBy"`
+	HeadersMatched   bool                    `json:"headersMatched"`
+	Id               string                  `json:"id"`
+	InputMatched     bool                    `json:"inputMatched"`
+	Matched          bool                    `json:"matched"`
+	Method           string                  `json:"method"`
+	Priority         int                     `json:"priority"`
+	Score            float64                 `json:"score"`
+	Service          string                  `json:"service"`
+	Session          string                  `json:"session"`
+	Specificity      int                     `json:"specificity"`
+	Times            int                     `json:"times"`
+	Used             int                     `json:"used"`
+	VisibleBySession bool                    `json:"visibleBySession"`
+	WithinTimes      bool                    `json:"withinTimes"`
+}
+
+// InspectCandidateEvent defines model for InspectCandidateEvent.
+type InspectCandidateEvent struct {
+	Reason *string `json:"reason,omitempty"`
+	Result string  `json:"result"`
+	Stage  string  `json:"stage"`
+}
+
+// InspectReport defines model for InspectReport.
+type InspectReport struct {
+	Candidates       []InspectCandidate `json:"candidates"`
+	Error            string             `json:"error"`
+	FallbackToMethod bool               `json:"fallbackToMethod"`
+	MatchedStubId    string             `json:"matchedStubId"`
+	Method           string             `json:"method"`
+	Service          string             `json:"service"`
+	Session          string             `json:"session"`
+	SimilarStubId    string             `json:"similarStubId"`
+	Stages           []InspectStage     `json:"stages"`
+}
+
+// InspectRequest defines model for InspectRequest.
+type InspectRequest struct {
+	Headers map[string]interface{}   `json:"headers,omitempty"`
+	Id      *ID                      `json:"id,omitempty"`
+	Input   []map[string]interface{} `json:"input,omitempty"`
+	Method  string                   `json:"method"`
+	Service string                   `json:"service"`
+	Session *string                  `json:"session,omitempty"`
+}
+
+// InspectStage defines model for InspectStage.
+type InspectStage struct {
+	After   int    `json:"after"`
+	Before  int    `json:"before"`
+	Name    string `json:"name"`
+	Removed int    `json:"removed"`
+}
 
 // ListID defines model for ListID.
 type ListID = []ID
@@ -120,8 +277,63 @@ type MessageOK struct {
 
 // Method defines model for Method.
 type Method struct {
-	Id   string `json:"id"`
-	Name string `json:"name"`
+	// ClientStreaming Indicates client-side streaming method
+	ClientStreaming bool   `json:"clientStreaming,omitempty"`
+	Id              string `json:"id"`
+
+	// MethodType gRPC method interaction type
+	MethodType    MethodMethodType    `json:"methodType"`
+	Name          string              `json:"name"`
+	RequestSchema *ProtoMessageSchema `json:"requestSchema,omitempty"`
+
+	// RequestType Fully-qualified protobuf request message type
+	RequestType    *string             `json:"requestType,omitempty"`
+	ResponseSchema *ProtoMessageSchema `json:"responseSchema,omitempty"`
+
+	// ResponseType Fully-qualified protobuf response message type
+	ResponseType *string `json:"responseType,omitempty"`
+
+	// ServerStreaming Indicates server-side streaming method
+	ServerStreaming bool `json:"serverStreaming,omitempty"`
+}
+
+// MethodMethodType gRPC method interaction type
+type MethodMethodType string
+
+// ProtoFieldSchema defines model for ProtoFieldSchema.
+type ProtoFieldSchema struct {
+	Cardinality      ProtoFieldSchemaCardinality `json:"cardinality"`
+	EnumValues       *[]string                   `json:"enumValues,omitempty"`
+	JsonName         string                      `json:"jsonName"`
+	Kind             string                      `json:"kind"`
+	Map              bool                        `json:"map,omitempty"`
+	MapKeyKind       *string                     `json:"mapKeyKind,omitempty"`
+	MapValueKind     *string                     `json:"mapValueKind,omitempty"`
+	MapValueMessage  *ProtoMessageSchema         `json:"mapValueMessage,omitempty"`
+	MapValueTypeName *string                     `json:"mapValueTypeName,omitempty"`
+	Message          *ProtoMessageSchema         `json:"message,omitempty"`
+	Name             string                      `json:"name"`
+	Number           int                         `json:"number"`
+
+	// Oneof Oneof group name if field belongs to oneof
+	Oneof *string `json:"oneof,omitempty"`
+
+	// TypeName Referenced protobuf type for message/enum fields
+	TypeName *string `json:"typeName,omitempty"`
+}
+
+// ProtoFieldSchemaCardinality defines model for ProtoFieldSchema.Cardinality.
+type ProtoFieldSchemaCardinality string
+
+// ProtoMessageSchema defines model for ProtoMessageSchema.
+type ProtoMessageSchema struct {
+	Fields []ProtoFieldSchema `json:"fields"`
+
+	// RecursiveRef True when schema expansion stopped due to recursive reference
+	RecursiveRef bool `json:"recursiveRef,omitempty"`
+
+	// TypeName Fully-qualified protobuf message type name
+	TypeName string `json:"typeName"`
 }
 
 // SearchRequest defines model for SearchRequest.
@@ -147,6 +359,11 @@ type Service struct {
 	Methods []Method `json:"methods"`
 	Name    string   `json:"name"`
 	Package string   `json:"package"`
+}
+
+// Sessions defines model for Sessions.
+type Sessions struct {
+	Sessions []string `json:"sessions"`
 }
 
 // Stub defines model for Stub.
@@ -241,6 +458,9 @@ type AddStubJSONRequestBody AddStubJSONBody
 
 // BatchStubsDeleteJSONRequestBody defines body for BatchStubsDelete for application/json ContentType.
 type BatchStubsDeleteJSONRequestBody = ListID
+
+// InspectStubsJSONRequestBody defines body for InspectStubs for application/json ContentType.
+type InspectStubsJSONRequestBody = InspectRequest
 
 // SearchStubsJSONRequestBody defines body for SearchStubs for application/json ContentType.
 type SearchStubsJSONRequestBody = SearchRequest
@@ -449,6 +669,15 @@ func WithRequestEditorFn(fn RequestEditorFn) ClientOption {
 
 // The interface specification for the client above.
 type ClientInterface interface {
+	// Dashboard request
+	Dashboard(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// DashboardInfo request
+	DashboardInfo(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// DashboardOverview request
+	DashboardOverview(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
+
 	// ListDescriptors request
 	ListDescriptors(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
 
@@ -478,8 +707,17 @@ type ClientInterface interface {
 	// DeleteService request
 	DeleteService(ctx context.Context, serviceID string, reqEditors ...RequestEditorFn) (*http.Response, error)
 
+	// ServiceGet request
+	ServiceGet(ctx context.Context, serviceID string, reqEditors ...RequestEditorFn) (*http.Response, error)
+
 	// ServiceMethodsList request
 	ServiceMethodsList(ctx context.Context, serviceID string, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// ServiceMethodGet request
+	ServiceMethodGet(ctx context.Context, serviceID string, methodID string, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// SessionsList request
+	SessionsList(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// PurgeStubs request
 	PurgeStubs(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
@@ -496,6 +734,11 @@ type ClientInterface interface {
 	BatchStubsDeleteWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	BatchStubsDelete(ctx context.Context, body BatchStubsDeleteJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// InspectStubsWithBody request with any body
+	InspectStubsWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	InspectStubs(ctx context.Context, body InspectStubsJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// SearchStubsWithBody request with any body
 	SearchStubsWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
@@ -518,6 +761,42 @@ type ClientInterface interface {
 	VerifyCallsWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	VerifyCalls(ctx context.Context, body VerifyCallsJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+}
+
+func (c *Client) Dashboard(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDashboardRequest(c.Server)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) DashboardInfo(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDashboardInfoRequest(c.Server)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) DashboardOverview(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDashboardOverviewRequest(c.Server)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
 }
 
 func (c *Client) ListDescriptors(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
@@ -640,8 +919,44 @@ func (c *Client) DeleteService(ctx context.Context, serviceID string, reqEditors
 	return c.Client.Do(req)
 }
 
+func (c *Client) ServiceGet(ctx context.Context, serviceID string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewServiceGetRequest(c.Server, serviceID)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
 func (c *Client) ServiceMethodsList(ctx context.Context, serviceID string, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewServiceMethodsListRequest(c.Server, serviceID)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) ServiceMethodGet(ctx context.Context, serviceID string, methodID string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewServiceMethodGetRequest(c.Server, serviceID, methodID)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) SessionsList(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewSessionsListRequest(c.Server)
 	if err != nil {
 		return nil, err
 	}
@@ -714,6 +1029,30 @@ func (c *Client) BatchStubsDeleteWithBody(ctx context.Context, contentType strin
 
 func (c *Client) BatchStubsDelete(ctx context.Context, body BatchStubsDeleteJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewBatchStubsDeleteRequest(c.Server, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) InspectStubsWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewInspectStubsRequestWithBody(c.Server, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) InspectStubs(ctx context.Context, body InspectStubsJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewInspectStubsRequest(c.Server, body)
 	if err != nil {
 		return nil, err
 	}
@@ -818,6 +1157,87 @@ func (c *Client) VerifyCalls(ctx context.Context, body VerifyCallsJSONRequestBod
 		return nil, err
 	}
 	return c.Client.Do(req)
+}
+
+// NewDashboardRequest generates requests for Dashboard
+func NewDashboardRequest(server string) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/dashboard")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewDashboardInfoRequest generates requests for DashboardInfo
+func NewDashboardInfoRequest(server string) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/dashboard/info")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewDashboardOverviewRequest generates requests for DashboardOverview
+func NewDashboardOverviewRequest(server string) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/dashboard/overview")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
 }
 
 // NewListDescriptorsRequest generates requests for ListDescriptors
@@ -1085,6 +1505,40 @@ func NewDeleteServiceRequest(server string, serviceID string) (*http.Request, er
 	return req, nil
 }
 
+// NewServiceGetRequest generates requests for ServiceGet
+func NewServiceGetRequest(server string, serviceID string) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithOptions("simple", false, "serviceID", serviceID, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationPath, Type: "string", Format: ""})
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/services/%s", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
 // NewServiceMethodsListRequest generates requests for ServiceMethodsList
 func NewServiceMethodsListRequest(server string, serviceID string) (*http.Request, error) {
 	var err error
@@ -1102,6 +1556,74 @@ func NewServiceMethodsListRequest(server string, serviceID string) (*http.Reques
 	}
 
 	operationPath := fmt.Sprintf("/services/%s/methods", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewServiceMethodGetRequest generates requests for ServiceMethodGet
+func NewServiceMethodGetRequest(server string, serviceID string, methodID string) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithOptions("simple", false, "serviceID", serviceID, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationPath, Type: "string", Format: ""})
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithOptions("simple", false, "methodID", methodID, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationPath, Type: "string", Format: ""})
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/services/%s/methods/%s", pathParam0, pathParam1)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewSessionsListRequest generates requests for SessionsList
+func NewSessionsListRequest(server string) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/sessions")
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -1234,6 +1756,46 @@ func NewBatchStubsDeleteRequestWithBody(server string, contentType string, body 
 	}
 
 	operationPath := fmt.Sprintf("/stubs/batchDelete")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewInspectStubsRequest calls the generic InspectStubs builder with application/json body
+func NewInspectStubsRequest(server string, body InspectStubsJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewInspectStubsRequestWithBody(server, "application/json", bodyReader)
+}
+
+// NewInspectStubsRequestWithBody generates requests for InspectStubs with any type of body
+func NewInspectStubsRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/stubs/inspect")
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -1498,6 +2060,15 @@ func WithBaseURL(baseURL string) ClientOption {
 
 // ClientWithResponsesInterface is the interface specification for the client with responses above.
 type ClientWithResponsesInterface interface {
+	// DashboardWithResponse request
+	DashboardWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*DashboardResponse, error)
+
+	// DashboardInfoWithResponse request
+	DashboardInfoWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*DashboardInfoResponse, error)
+
+	// DashboardOverviewWithResponse request
+	DashboardOverviewWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*DashboardOverviewResponse, error)
+
 	// ListDescriptorsWithResponse request
 	ListDescriptorsWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*ListDescriptorsResponse, error)
 
@@ -1527,8 +2098,17 @@ type ClientWithResponsesInterface interface {
 	// DeleteServiceWithResponse request
 	DeleteServiceWithResponse(ctx context.Context, serviceID string, reqEditors ...RequestEditorFn) (*DeleteServiceResponse, error)
 
+	// ServiceGetWithResponse request
+	ServiceGetWithResponse(ctx context.Context, serviceID string, reqEditors ...RequestEditorFn) (*ServiceGetResponse, error)
+
 	// ServiceMethodsListWithResponse request
 	ServiceMethodsListWithResponse(ctx context.Context, serviceID string, reqEditors ...RequestEditorFn) (*ServiceMethodsListResponse, error)
+
+	// ServiceMethodGetWithResponse request
+	ServiceMethodGetWithResponse(ctx context.Context, serviceID string, methodID string, reqEditors ...RequestEditorFn) (*ServiceMethodGetResponse, error)
+
+	// SessionsListWithResponse request
+	SessionsListWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*SessionsListResponse, error)
 
 	// PurgeStubsWithResponse request
 	PurgeStubsWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*PurgeStubsResponse, error)
@@ -1545,6 +2125,11 @@ type ClientWithResponsesInterface interface {
 	BatchStubsDeleteWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*BatchStubsDeleteResponse, error)
 
 	BatchStubsDeleteWithResponse(ctx context.Context, body BatchStubsDeleteJSONRequestBody, reqEditors ...RequestEditorFn) (*BatchStubsDeleteResponse, error)
+
+	// InspectStubsWithBodyWithResponse request with any body
+	InspectStubsWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*InspectStubsResponse, error)
+
+	InspectStubsWithResponse(ctx context.Context, body InspectStubsJSONRequestBody, reqEditors ...RequestEditorFn) (*InspectStubsResponse, error)
 
 	// SearchStubsWithBodyWithResponse request with any body
 	SearchStubsWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*SearchStubsResponse, error)
@@ -1567,6 +2152,72 @@ type ClientWithResponsesInterface interface {
 	VerifyCallsWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*VerifyCallsResponse, error)
 
 	VerifyCallsWithResponse(ctx context.Context, body VerifyCallsJSONRequestBody, reqEditors ...RequestEditorFn) (*VerifyCallsResponse, error)
+}
+
+type DashboardResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *Dashboard
+}
+
+// Status returns HTTPResponse.Status
+func (r DashboardResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r DashboardResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type DashboardInfoResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *DashboardInfo
+}
+
+// Status returns HTTPResponse.Status
+func (r DashboardInfoResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r DashboardInfoResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type DashboardOverviewResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *DashboardOverview
+}
+
+// Status returns HTTPResponse.Status
+func (r DashboardOverviewResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r DashboardOverviewResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
 }
 
 type ListDescriptorsResponse struct {
@@ -1766,6 +2417,28 @@ func (r DeleteServiceResponse) StatusCode() int {
 	return 0
 }
 
+type ServiceGetResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *Service
+}
+
+// Status returns HTTPResponse.Status
+func (r ServiceGetResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r ServiceGetResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
 type ServiceMethodsListResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
@@ -1782,6 +2455,50 @@ func (r ServiceMethodsListResponse) Status() string {
 
 // StatusCode returns HTTPResponse.StatusCode
 func (r ServiceMethodsListResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type ServiceMethodGetResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *Method
+}
+
+// Status returns HTTPResponse.Status
+func (r ServiceMethodGetResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r ServiceMethodGetResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type SessionsListResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *Sessions
+}
+
+// Status returns HTTPResponse.Status
+func (r SessionsListResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r SessionsListResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
@@ -1870,6 +2587,28 @@ func (r BatchStubsDeleteResponse) Status() string {
 
 // StatusCode returns HTTPResponse.StatusCode
 func (r BatchStubsDeleteResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type InspectStubsResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *InspectReport
+}
+
+// Status returns HTTPResponse.Status
+func (r InspectStubsResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r InspectStubsResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
@@ -2008,6 +2747,33 @@ func (r VerifyCallsResponse) StatusCode() int {
 	return 0
 }
 
+// DashboardWithResponse request returning *DashboardResponse
+func (c *ClientWithResponses) DashboardWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*DashboardResponse, error) {
+	rsp, err := c.Dashboard(ctx, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseDashboardResponse(rsp)
+}
+
+// DashboardInfoWithResponse request returning *DashboardInfoResponse
+func (c *ClientWithResponses) DashboardInfoWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*DashboardInfoResponse, error) {
+	rsp, err := c.DashboardInfo(ctx, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseDashboardInfoResponse(rsp)
+}
+
+// DashboardOverviewWithResponse request returning *DashboardOverviewResponse
+func (c *ClientWithResponses) DashboardOverviewWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*DashboardOverviewResponse, error) {
+	rsp, err := c.DashboardOverview(ctx, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseDashboardOverviewResponse(rsp)
+}
+
 // ListDescriptorsWithResponse request returning *ListDescriptorsResponse
 func (c *ClientWithResponses) ListDescriptorsWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*ListDescriptorsResponse, error) {
 	rsp, err := c.ListDescriptors(ctx, reqEditors...)
@@ -2097,6 +2863,15 @@ func (c *ClientWithResponses) DeleteServiceWithResponse(ctx context.Context, ser
 	return ParseDeleteServiceResponse(rsp)
 }
 
+// ServiceGetWithResponse request returning *ServiceGetResponse
+func (c *ClientWithResponses) ServiceGetWithResponse(ctx context.Context, serviceID string, reqEditors ...RequestEditorFn) (*ServiceGetResponse, error) {
+	rsp, err := c.ServiceGet(ctx, serviceID, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseServiceGetResponse(rsp)
+}
+
 // ServiceMethodsListWithResponse request returning *ServiceMethodsListResponse
 func (c *ClientWithResponses) ServiceMethodsListWithResponse(ctx context.Context, serviceID string, reqEditors ...RequestEditorFn) (*ServiceMethodsListResponse, error) {
 	rsp, err := c.ServiceMethodsList(ctx, serviceID, reqEditors...)
@@ -2104,6 +2879,24 @@ func (c *ClientWithResponses) ServiceMethodsListWithResponse(ctx context.Context
 		return nil, err
 	}
 	return ParseServiceMethodsListResponse(rsp)
+}
+
+// ServiceMethodGetWithResponse request returning *ServiceMethodGetResponse
+func (c *ClientWithResponses) ServiceMethodGetWithResponse(ctx context.Context, serviceID string, methodID string, reqEditors ...RequestEditorFn) (*ServiceMethodGetResponse, error) {
+	rsp, err := c.ServiceMethodGet(ctx, serviceID, methodID, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseServiceMethodGetResponse(rsp)
+}
+
+// SessionsListWithResponse request returning *SessionsListResponse
+func (c *ClientWithResponses) SessionsListWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*SessionsListResponse, error) {
+	rsp, err := c.SessionsList(ctx, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseSessionsListResponse(rsp)
 }
 
 // PurgeStubsWithResponse request returning *PurgeStubsResponse
@@ -2156,6 +2949,23 @@ func (c *ClientWithResponses) BatchStubsDeleteWithResponse(ctx context.Context, 
 		return nil, err
 	}
 	return ParseBatchStubsDeleteResponse(rsp)
+}
+
+// InspectStubsWithBodyWithResponse request with arbitrary body returning *InspectStubsResponse
+func (c *ClientWithResponses) InspectStubsWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*InspectStubsResponse, error) {
+	rsp, err := c.InspectStubsWithBody(ctx, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseInspectStubsResponse(rsp)
+}
+
+func (c *ClientWithResponses) InspectStubsWithResponse(ctx context.Context, body InspectStubsJSONRequestBody, reqEditors ...RequestEditorFn) (*InspectStubsResponse, error) {
+	rsp, err := c.InspectStubs(ctx, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseInspectStubsResponse(rsp)
 }
 
 // SearchStubsWithBodyWithResponse request with arbitrary body returning *SearchStubsResponse
@@ -2226,6 +3036,84 @@ func (c *ClientWithResponses) VerifyCallsWithResponse(ctx context.Context, body 
 		return nil, err
 	}
 	return ParseVerifyCallsResponse(rsp)
+}
+
+// ParseDashboardResponse parses an HTTP response from a DashboardWithResponse call
+func ParseDashboardResponse(rsp *http.Response) (*DashboardResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &DashboardResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest Dashboard
+		if err := jsonUnmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseDashboardInfoResponse parses an HTTP response from a DashboardInfoWithResponse call
+func ParseDashboardInfoResponse(rsp *http.Response) (*DashboardInfoResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &DashboardInfoResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest DashboardInfo
+		if err := jsonUnmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseDashboardOverviewResponse parses an HTTP response from a DashboardOverviewWithResponse call
+func ParseDashboardOverviewResponse(rsp *http.Response) (*DashboardOverviewResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &DashboardOverviewResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest DashboardOverview
+		if err := jsonUnmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	}
+
+	return response, nil
 }
 
 // ParseListDescriptorsResponse parses an HTTP response from a ListDescriptorsWithResponse call
@@ -2452,6 +3340,32 @@ func ParseDeleteServiceResponse(rsp *http.Response) (*DeleteServiceResponse, err
 	return response, nil
 }
 
+// ParseServiceGetResponse parses an HTTP response from a ServiceGetWithResponse call
+func ParseServiceGetResponse(rsp *http.Response) (*ServiceGetResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &ServiceGetResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest Service
+		if err := jsonUnmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	}
+
+	return response, nil
+}
+
 // ParseServiceMethodsListResponse parses an HTTP response from a ServiceMethodsListWithResponse call
 func ParseServiceMethodsListResponse(rsp *http.Response) (*ServiceMethodsListResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
@@ -2468,6 +3382,58 @@ func ParseServiceMethodsListResponse(rsp *http.Response) (*ServiceMethodsListRes
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
 		var dest []Method
+		if err := jsonUnmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseServiceMethodGetResponse parses an HTTP response from a ServiceMethodGetWithResponse call
+func ParseServiceMethodGetResponse(rsp *http.Response) (*ServiceMethodGetResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &ServiceMethodGetResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest Method
+		if err := jsonUnmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseSessionsListResponse parses an HTTP response from a SessionsListWithResponse call
+func ParseSessionsListResponse(rsp *http.Response) (*SessionsListResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &SessionsListResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest Sessions
 		if err := jsonUnmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
@@ -2559,6 +3525,32 @@ func ParseBatchStubsDeleteResponse(rsp *http.Response) (*BatchStubsDeleteRespons
 	response := &BatchStubsDeleteResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
+	}
+
+	return response, nil
+}
+
+// ParseInspectStubsResponse parses an HTTP response from a InspectStubsWithResponse call
+func ParseInspectStubsResponse(rsp *http.Response) (*InspectStubsResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &InspectStubsResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest InspectReport
+		if err := jsonUnmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
 	}
 
 	return response, nil
