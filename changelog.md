@@ -1,5 +1,16 @@
 # Changelog
 
+## v1.3.0 - 2026-03-26
+
+### What's Changed
+
+* Bump github.com/bavix/gripmock/v3 from 3.8.1 to 3.8.2 by [@dependabot](https://github.com/dependabot)[bot] in https://github.com/bavix/gripmock-sdk-go/pull/52
+* Bump github.com/bavix/gripmock/v3 from 3.8.2 to 3.8.3 by [@dependabot](https://github.com/dependabot)[bot] in https://github.com/bavix/gripmock-sdk-go/pull/55
+* Bump github.com/oapi-codegen/runtime from 1.3.0 to 1.3.1 by [@dependabot](https://github.com/dependabot)[bot] in https://github.com/bavix/gripmock-sdk-go/pull/56
+* Bump github.com/bavix/gripmock/v3 from 3.8.3 to 3.8.7 by [@dependabot](https://github.com/dependabot)[bot] in https://github.com/bavix/gripmock-sdk-go/pull/58
+
+**Full Changelog**: https://github.com/bavix/gripmock-sdk-go/compare/v1.2.0...v1.3.0
+
 ## v1.2.0 - 2026-03-08
 
 ### What's Changed
