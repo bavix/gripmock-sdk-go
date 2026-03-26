@@ -212,63 +212,6 @@ type InspectStage struct {
 // ListID defines model for ListID.
 type ListID = []ID
 
-// McpError defines model for McpError.
-type McpError struct {
-	Code    int            `json:"code"`
-	Data    map[string]any `json:"data,omitempty"`
-	Message string         `json:"message"`
-}
-
-// McpID defines model for McpID.
-type McpID struct {
-	union json.RawMessage
-}
-
-// McpID0 defines model for .
-type McpID0 = string
-
-// McpID1 defines model for .
-type McpID1 = int
-
-// McpInfoResponse defines model for McpInfoResponse.
-type McpInfoResponse struct {
-	Methods         []string     `json:"methods"`
-	ProtocolVersion string       `json:"protocolVersion"`
-	ServerName      string       `json:"serverName"`
-	ServerVersion   string       `json:"serverVersion"`
-	Tools           []McpTool    `json:"tools"`
-	Transport       McpTransport `json:"transport"`
-}
-
-// McpRequest defines model for McpRequest.
-type McpRequest struct {
-	Id      *McpID         `json:"id,omitempty"`
-	Jsonrpc string         `json:"jsonrpc"`
-	Method  string         `json:"method"`
-	Params  map[string]any `json:"params,omitempty"`
-}
-
-// McpResponse defines model for McpResponse.
-type McpResponse struct {
-	Error   *McpError      `json:"error,omitempty"`
-	Id      *McpID         `json:"id,omitempty"`
-	Jsonrpc string         `json:"jsonrpc"`
-	Result  map[string]any `json:"result,omitempty"`
-}
-
-// McpTool defines model for McpTool.
-type McpTool struct {
-	Description string         `json:"description"`
-	InputSchema map[string]any `json:"inputSchema"`
-	Name        string         `json:"name"`
-}
-
-// McpTransport defines model for McpTransport.
-type McpTransport struct {
-	Methods []string `json:"methods"`
-	Path    string   `json:"path"`
-}
-
 // MessageOK defines model for MessageOK.
 type MessageOK struct {
 	Message string    `json:"message"`
@@ -450,9 +393,6 @@ type AddStubJSONBody struct {
 	union json.RawMessage
 }
 
-// McpMessageJSONRequestBody defines body for McpMessage for application/json ContentType.
-type McpMessageJSONRequestBody = McpRequest
-
 // AddStubJSONRequestBody defines body for AddStub for application/json ContentType.
 type AddStubJSONRequestBody AddStubJSONBody
 
@@ -532,68 +472,6 @@ func (a StubOutput_Details_Item) MarshalJSON() ([]byte, error) {
 		}
 	}
 	return json.Marshal(object)
-}
-
-// AsMcpID0 returns the union data inside the McpID as a McpID0
-func (t McpID) AsMcpID0() (McpID0, error) {
-	var body McpID0
-	err := jsonUnmarshal(t.union, &body)
-	return body, err
-}
-
-// FromMcpID0 overwrites any union data inside the McpID as the provided McpID0
-func (t *McpID) FromMcpID0(v McpID0) error {
-	b, err := json.Marshal(v)
-	t.union = b
-	return err
-}
-
-// MergeMcpID0 performs a merge with any union data inside the McpID, using the provided McpID0
-func (t *McpID) MergeMcpID0(v McpID0) error {
-	b, err := json.Marshal(v)
-	if err != nil {
-		return err
-	}
-
-	merged, err := runtime.JSONMerge(t.union, b)
-	t.union = merged
-	return err
-}
-
-// AsMcpID1 returns the union data inside the McpID as a McpID1
-func (t McpID) AsMcpID1() (McpID1, error) {
-	var body McpID1
-	err := jsonUnmarshal(t.union, &body)
-	return body, err
-}
-
-// FromMcpID1 overwrites any union data inside the McpID as the provided McpID1
-func (t *McpID) FromMcpID1(v McpID1) error {
-	b, err := json.Marshal(v)
-	t.union = b
-	return err
-}
-
-// MergeMcpID1 performs a merge with any union data inside the McpID, using the provided McpID1
-func (t *McpID) MergeMcpID1(v McpID1) error {
-	b, err := json.Marshal(v)
-	if err != nil {
-		return err
-	}
-
-	merged, err := runtime.JSONMerge(t.union, b)
-	t.union = merged
-	return err
-}
-
-func (t McpID) MarshalJSON() ([]byte, error) {
-	b, err := t.union.MarshalJSON()
-	return b, err
-}
-
-func (t *McpID) UnmarshalJSON(b []byte) error {
-	err := t.union.UnmarshalJSON(b)
-	return err
 }
 
 // RequestEditorFn  is the function signature for the RequestEditor callback function
@@ -692,14 +570,6 @@ type ClientInterface interface {
 
 	// ListHistory request
 	ListHistory(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	// McpInfo request
-	McpInfo(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	// McpMessageWithBody request with any body
-	McpMessageWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	McpMessage(ctx context.Context, body McpMessageJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ServicesList request
 	ServicesList(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
@@ -849,42 +719,6 @@ func (c *Client) Readiness(ctx context.Context, reqEditors ...RequestEditorFn) (
 
 func (c *Client) ListHistory(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewListHistoryRequest(c.Server)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-func (c *Client) McpInfo(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewMcpInfoRequest(c.Server)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-func (c *Client) McpMessageWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewMcpMessageRequestWithBody(c.Server, contentType, body)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-func (c *Client) McpMessage(ctx context.Context, body McpMessageJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewMcpMessageRequest(c.Server, body)
 	if err != nil {
 		return nil, err
 	}
@@ -1373,73 +1207,6 @@ func NewListHistoryRequest(server string) (*http.Request, error) {
 	if err != nil {
 		return nil, err
 	}
-
-	return req, nil
-}
-
-// NewMcpInfoRequest generates requests for McpInfo
-func NewMcpInfoRequest(server string) (*http.Request, error) {
-	var err error
-
-	serverURL, err := url.Parse(server)
-	if err != nil {
-		return nil, err
-	}
-
-	operationPath := fmt.Sprintf("/mcp")
-	if operationPath[0] == '/' {
-		operationPath = "." + operationPath
-	}
-
-	queryURL, err := serverURL.Parse(operationPath)
-	if err != nil {
-		return nil, err
-	}
-
-	req, err := http.NewRequest("GET", queryURL.String(), nil)
-	if err != nil {
-		return nil, err
-	}
-
-	return req, nil
-}
-
-// NewMcpMessageRequest calls the generic McpMessage builder with application/json body
-func NewMcpMessageRequest(server string, body McpMessageJSONRequestBody) (*http.Request, error) {
-	var bodyReader io.Reader
-	buf, err := json.Marshal(body)
-	if err != nil {
-		return nil, err
-	}
-	bodyReader = bytes.NewReader(buf)
-	return NewMcpMessageRequestWithBody(server, "application/json", bodyReader)
-}
-
-// NewMcpMessageRequestWithBody generates requests for McpMessage with any type of body
-func NewMcpMessageRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
-	var err error
-
-	serverURL, err := url.Parse(server)
-	if err != nil {
-		return nil, err
-	}
-
-	operationPath := fmt.Sprintf("/mcp")
-	if operationPath[0] == '/' {
-		operationPath = "." + operationPath
-	}
-
-	queryURL, err := serverURL.Parse(operationPath)
-	if err != nil {
-		return nil, err
-	}
-
-	req, err := http.NewRequest("POST", queryURL.String(), body)
-	if err != nil {
-		return nil, err
-	}
-
-	req.Header.Add("Content-Type", contentType)
 
 	return req, nil
 }
@@ -2084,14 +1851,6 @@ type ClientWithResponsesInterface interface {
 	// ListHistoryWithResponse request
 	ListHistoryWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*ListHistoryResponse, error)
 
-	// McpInfoWithResponse request
-	McpInfoWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*McpInfoResponse, error)
-
-	// McpMessageWithBodyWithResponse request with any body
-	McpMessageWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*McpMessageResponse, error)
-
-	McpMessageWithResponse(ctx context.Context, body McpMessageJSONRequestBody, reqEditors ...RequestEditorFn) (*McpMessageResponse, error)
-
 	// ServicesListWithResponse request
 	ServicesListWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*ServicesListResponse, error)
 
@@ -2324,50 +2083,6 @@ func (r ListHistoryResponse) Status() string {
 
 // StatusCode returns HTTPResponse.StatusCode
 func (r ListHistoryResponse) StatusCode() int {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.StatusCode
-	}
-	return 0
-}
-
-type McpInfoResponse struct {
-	Body         []byte
-	HTTPResponse *http.Response
-	JSON200      *McpInfoResponse
-}
-
-// Status returns HTTPResponse.Status
-func (r McpInfoResponse) Status() string {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.Status
-	}
-	return http.StatusText(0)
-}
-
-// StatusCode returns HTTPResponse.StatusCode
-func (r McpInfoResponse) StatusCode() int {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.StatusCode
-	}
-	return 0
-}
-
-type McpMessageResponse struct {
-	Body         []byte
-	HTTPResponse *http.Response
-	JSON200      *McpResponse
-}
-
-// Status returns HTTPResponse.Status
-func (r McpMessageResponse) Status() string {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.Status
-	}
-	return http.StatusText(0)
-}
-
-// StatusCode returns HTTPResponse.StatusCode
-func (r McpMessageResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
@@ -2819,32 +2534,6 @@ func (c *ClientWithResponses) ListHistoryWithResponse(ctx context.Context, reqEd
 	return ParseListHistoryResponse(rsp)
 }
 
-// McpInfoWithResponse request returning *McpInfoResponse
-func (c *ClientWithResponses) McpInfoWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*McpInfoResponse, error) {
-	rsp, err := c.McpInfo(ctx, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseMcpInfoResponse(rsp)
-}
-
-// McpMessageWithBodyWithResponse request with arbitrary body returning *McpMessageResponse
-func (c *ClientWithResponses) McpMessageWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*McpMessageResponse, error) {
-	rsp, err := c.McpMessageWithBody(ctx, contentType, body, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseMcpMessageResponse(rsp)
-}
-
-func (c *ClientWithResponses) McpMessageWithResponse(ctx context.Context, body McpMessageJSONRequestBody, reqEditors ...RequestEditorFn) (*McpMessageResponse, error) {
-	rsp, err := c.McpMessage(ctx, body, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseMcpMessageResponse(rsp)
-}
-
 // ServicesListWithResponse request returning *ServicesListResponse
 func (c *ClientWithResponses) ServicesListWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*ServicesListResponse, error) {
 	rsp, err := c.ServicesList(ctx, reqEditors...)
@@ -3236,58 +2925,6 @@ func ParseListHistoryResponse(rsp *http.Response) (*ListHistoryResponse, error) 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
 		var dest HistoryList
-		if err := jsonUnmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON200 = &dest
-
-	}
-
-	return response, nil
-}
-
-// ParseMcpInfoResponse parses an HTTP response from a McpInfoWithResponse call
-func ParseMcpInfoResponse(rsp *http.Response) (*McpInfoResponse, error) {
-	bodyBytes, err := io.ReadAll(rsp.Body)
-	defer func() { _ = rsp.Body.Close() }()
-	if err != nil {
-		return nil, err
-	}
-
-	response := &McpInfoResponse{
-		Body:         bodyBytes,
-		HTTPResponse: rsp,
-	}
-
-	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest McpInfoResponse
-		if err := jsonUnmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON200 = &dest
-
-	}
-
-	return response, nil
-}
-
-// ParseMcpMessageResponse parses an HTTP response from a McpMessageWithResponse call
-func ParseMcpMessageResponse(rsp *http.Response) (*McpMessageResponse, error) {
-	bodyBytes, err := io.ReadAll(rsp.Body)
-	defer func() { _ = rsp.Body.Close() }()
-	if err != nil {
-		return nil, err
-	}
-
-	response := &McpMessageResponse{
-		Body:         bodyBytes,
-		HTTPResponse: rsp,
-	}
-
-	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest McpResponse
 		if err := jsonUnmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
