@@ -5,7 +5,7 @@ go 1.26
 require (
 	github.com/bavix/gripmock/v3 v3.9.1
 	github.com/oapi-codegen/runtime v1.3.1
-	google.golang.org/grpc v1.79.3
+	google.golang.org/grpc v1.80.0
 )
 
 require (
