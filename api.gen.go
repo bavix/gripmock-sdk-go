@@ -326,6 +326,9 @@ type Stub struct {
 	// Priority Priority of the stub. Higher priority stubs are matched first.
 	Priority int    `json:"priority,omitempty"`
 	Service  string `json:"service"`
+
+	// Source Source of the stub (file, rest, mcp, proxy)
+	Source *string `json:"source,omitempty,omitzero"`
 }
 
 // StubHeaders defines model for StubHeaders.
@@ -386,6 +389,30 @@ type VerifyRequest struct {
 	ExpectedCount int    `json:"expectedCount"`
 	Method        string `json:"method"`
 	Service       string `json:"service"`
+}
+
+// ListStubsParams defines parameters for ListStubs.
+type ListStubsParams struct {
+	// Source Filter by source (file, rest, mcp, proxy)
+	Source *string `form:"source,omitempty" json:"source,omitempty"`
+
+	// Service Filter by service name (exact match)
+	Service *string `form:"service,omitempty" json:"service,omitempty"`
+
+	// Method Filter by method name (exact match)
+	Method *string `form:"method,omitempty" json:"method,omitempty"`
+
+	// Session Filter by session ID (empty means global stubs)
+	Session *string `form:"session,omitempty" json:"session,omitempty"`
+
+	// Limit Maximum number of returned stubs
+	Limit *int `form:"limit,omitempty" json:"limit,omitempty"`
+
+	// Offset Number of stubs to skip before returning results
+	Offset *int `form:"offset,omitempty" json:"offset,omitempty"`
+
+	// Sort Sort order for result list
+	Sort *string `form:"sort,omitempty" json:"sort,omitempty"`
 }
 
 // AddStubJSONBody defines parameters for AddStub.
@@ -593,7 +620,7 @@ type ClientInterface interface {
 	PurgeStubs(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ListStubs request
-	ListStubs(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
+	ListStubs(ctx context.Context, params *ListStubsParams, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// AddStubWithBody request with any body
 	AddStubWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
@@ -813,8 +840,8 @@ func (c *Client) PurgeStubs(ctx context.Context, reqEditors ...RequestEditorFn) 
 	return c.Client.Do(req)
 }
 
-func (c *Client) ListStubs(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewListStubsRequest(c.Server)
+func (c *Client) ListStubs(ctx context.Context, params *ListStubsParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewListStubsRequest(c.Server, params)
 	if err != nil {
 		return nil, err
 	}
@@ -1436,7 +1463,7 @@ func NewPurgeStubsRequest(server string) (*http.Request, error) {
 }
 
 // NewListStubsRequest generates requests for ListStubs
-func NewListStubsRequest(server string) (*http.Request, error) {
+func NewListStubsRequest(server string, params *ListStubsParams) (*http.Request, error) {
 	var err error
 
 	serverURL, err := url.Parse(server)
@@ -1452,6 +1479,124 @@ func NewListStubsRequest(server string) (*http.Request, error) {
 	queryURL, err := serverURL.Parse(operationPath)
 	if err != nil {
 		return nil, err
+	}
+
+	if params != nil {
+		queryValues := queryURL.Query()
+
+		if params.Source != nil {
+
+			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "source", *params.Source, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "string", Format: ""}); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.Service != nil {
+
+			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "service", *params.Service, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "string", Format: ""}); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.Method != nil {
+
+			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "method", *params.Method, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "string", Format: ""}); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.Session != nil {
+
+			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "session", *params.Session, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "string", Format: ""}); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.Limit != nil {
+
+			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "limit", *params.Limit, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "integer", Format: ""}); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.Offset != nil {
+
+			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "offset", *params.Offset, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "integer", Format: ""}); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.Sort != nil {
+
+			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "sort", *params.Sort, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "string", Format: ""}); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		queryURL.RawQuery = queryValues.Encode()
 	}
 
 	req, err := http.NewRequest("GET", queryURL.String(), nil)
@@ -1873,7 +2018,7 @@ type ClientWithResponsesInterface interface {
 	PurgeStubsWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*PurgeStubsResponse, error)
 
 	// ListStubsWithResponse request
-	ListStubsWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*ListStubsResponse, error)
+	ListStubsWithResponse(ctx context.Context, params *ListStubsParams, reqEditors ...RequestEditorFn) (*ListStubsResponse, error)
 
 	// AddStubWithBodyWithResponse request with any body
 	AddStubWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*AddStubResponse, error)
@@ -2598,8 +2743,8 @@ func (c *ClientWithResponses) PurgeStubsWithResponse(ctx context.Context, reqEdi
 }
 
 // ListStubsWithResponse request returning *ListStubsResponse
-func (c *ClientWithResponses) ListStubsWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*ListStubsResponse, error) {
-	rsp, err := c.ListStubs(ctx, reqEditors...)
+func (c *ClientWithResponses) ListStubsWithResponse(ctx context.Context, params *ListStubsParams, reqEditors ...RequestEditorFn) (*ListStubsResponse, error) {
+	rsp, err := c.ListStubs(ctx, params, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
