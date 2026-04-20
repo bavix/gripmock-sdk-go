@@ -3,7 +3,7 @@ module github.com/bavix/gripmock-sdk-go
 go 1.26
 
 require (
-	github.com/bavix/gripmock/v3 v3.9.5
+	github.com/bavix/gripmock/v3 v3.10.0
 	github.com/oapi-codegen/runtime v1.4.0
 	google.golang.org/grpc v1.80.0
 )
