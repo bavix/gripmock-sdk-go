@@ -4,12 +4,12 @@ go 1.26
 
 require (
 	github.com/bavix/gripmock/v3 v3.9.5
-	github.com/oapi-codegen/runtime v1.4.0
+	github.com/google/uuid v1.6.0
+	github.com/oapi-codegen/runtime v1.4.1
 	google.golang.org/grpc v1.80.0
 )
 
 require (
 	github.com/apapsch/go-jsonmerge/v2 v2.0.0 // indirect
-	github.com/google/uuid v1.6.0 // indirect
 	golang.org/x/sys v0.43.0 // indirect
 )
